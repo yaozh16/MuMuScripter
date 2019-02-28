@@ -1,0 +1,14 @@
+aircv=1.4.6
+comtypes=1.1.7
+Cython=0.29.5
+numpy=1.16.1
+opencv-python=4.0.0.21
+Pillow=5.4.1
+pip=18.1
+pyHook=1.5.1
+PyUserInput=0.1.11
+pywin32=224
+pywinauto=0.6.5
+setuptools=40.5.0
+six=1.11.0
+wheel=0.32.2
