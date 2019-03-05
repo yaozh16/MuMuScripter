@@ -9,6 +9,7 @@ class FgoScriptTool(ScriptTool):
         super(FgoScriptTool,self).__init__()
         self._temRecordImage="imgs\\FGO\\Common\\tmp\\tmp.png"
         self._temRecordImage2="imgs\\FGO\\Common\\tmp\\tmp2.png"
+        self.setUp(u'命运-冠位指定 - MuMu模拟器')
     def waitReady(self,finishWait=0.5):
         self.loopWait(assFunc=self.asBattleReady, loopMax=None, finishWait=finishWait)
     def serventSkill(self, serventIndex, skillIndex,applyTo=None):
@@ -129,6 +130,10 @@ class FgoScriptTool(ScriptTool):
         clickPos=(2+20*index,5)
         self.click(clickPos,0.5)
         self.waitReady()
+    def resetBonus(self):
+        self.identifyAndClick("imgs\\FGO\\Common\\resetBonus.png")
+        self.loopWait(self.identifyAndClick,"imgs\\FGO\\Common\\resetConfirm.png")
+        self.loopWait(self.identifyAndClick,"imgs\\FGO\\Common\\closeBtn.png")
 
     def asMainPanel(self):
         return self.assertCrop2((0.88,0.02,0.97,0.09),expectImage="imgs\\FGO\\Common\\MainPanel.png")
@@ -162,7 +167,7 @@ class FgoScriptTool(ScriptTool):
     def asStrengthenPanel(self):
         return self.assertCrop2((0.40, 0.88, 0.53, 0.99), "imgs\\FGO\\Common\\StrengthenPanel.png")
     def asStrengthenConfirmPanel(self):
-        return self.assertCrop2((0.20, 0.78, 0.80, 0.90), "imgs\\FGO\\Common\\StrengthenConfirmPanel.png")
+        return None!=self.identifyAndFindPos("imgs\\FGO\\Common\\StrengthenConfirmPanel.png")
     def rectTest(self,rect):
         self.assertCrop1(rect,"test.png")
 
@@ -171,7 +176,7 @@ if __name__ == "__main__":
     tool=FgoScriptTool()
     tool.setUp(u'命运-冠位指定 - MuMu模拟器')
     #print(tool.click((95,95),0))
-    #print(tool.asAPRecoverConfirmPanel())
+    print(tool.asPoolEmpty())
     #tool.click((10, 90), 0.1)
     #tool.rectTest((0.48,0.48,0.52,0.52))
     #print(tool.asBattleResultPanel())

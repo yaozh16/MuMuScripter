@@ -19,14 +19,10 @@ class GFScriptTool(ScriptTool):
         return None != self.identifyAndFindPos("imgs\\GF\\Common\\EchelonFormation\\EchelonFormationPanel_PresetOptionBtn.png")
     def asEchelonFormationPresetOptions(self,selected=False):
         img1="imgs\\GF\\Common\\EchelonFormation\\EchelonFormationPresetOptions_SELECTED.png"
-        img2="imgs\\GF\\Common\\EchelonFormation\\EchelonFormationPresetOptions_INIT.png"
-        best=self.bestFit((0.78,0.80,0.98,0.96),[img1,img2])
         if(selected):
-            return None!=self.identifyAndFindPos(img1) and \
-                   img1==best[1]
+            return None!=self.identifyAndFindPos(img1)
         else:
-            return None!=self.identifyAndFindPos(img2) and \
-                   img2==best[1]
+            return  None==self.identifyAndFindPos(img1)
     def asBattle_Init(self):
         return None!=self.identifyAndFindPos("imgs\\GF\\Common\\Battle\\INIT.png")
     def asDeployPanel(self):
@@ -51,13 +47,18 @@ class GFScriptTool(ScriptTool):
         return None!=self.identifyAndFindPos("imgs\\GF\\Common\\Battle\\restartBtn.png",0.8)
     def asSwapable(self):
         return None!=self.identifyAndFindPos("imgs\\GF\\Common\\Battle\\swapBtn.png")
+    def asSelectable(self):
+        return None!=self.identifyAndFindPos("imgs\\GF\\Common\\Battle\\selectTeamBtn.png")
+    def asSkipable(self):
+        return None!=self.identifyAndFindPos("imgs\\GF\\Common\\battle\\skipBtn.png")
     def asPlanStepLeft(self,stepLeft):
         imgPath="imgs\\GF\\Common\\Battle\\PlanStepLeft\\%02d.png"%(stepLeft)
         return None!=self.identifyAndFindPos(imgPath,0.95)
     def asBattleInfo(self):
         return None!=self.identifyAndFindPos("imgs\\GF\\Common\\Battle\\battleInfo.png")
     def asBattleResult(self):
-        return None!=self.identifyAndFindPos("imgs\\GF\\Common\\BattleEntry\\BattleResult.png")
+        return None!=self.identifyAndFindPos("imgs\\GF\\Common\\BattleEntry\\BattleResult.png",0.9) or \
+               None != self.identifyAndFindPos("imgs\\GF\\Common\\BattleEntry\\BattleResult_2.png", 0.9)
 
     def asMainPanel(self):
         return None!=self.identifyAndFindPos("imgs\\GF\\Common\\MainPanel\\battle.png")
@@ -90,18 +91,39 @@ class GFScriptTool(ScriptTool):
             return None != self.identifyAndFindPos("imgs\\GF\\Common\\Factory\\3Retire\\Filter\\MG_1.png")
 
 
+    def asAmbushed(self):
+        return None!=self.identifyAndFindPos("imgs\\GF\\Common\\Battle\\ambushed.png")
+    def asBattlePaused(self):
+        return None!=self.identifyAndFindPos("imgs\\GF\\Common\\Battle\\battlePaused.png",0.8)
     def asRetireSelected(self,selected=True):
         if(not selected):
             return self.assertCrop1((0.86,0.84,0.98,0.96),"imgs\\GF\\Common\\Factory\\3Retire\\AutoSelectBtn.png")
         else:
             return self.assertCrop1((0.86,0.84,0.98,0.96),"imgs\\GF\\Common\\Factory\\3Retire\\AutoSelectConfirmBtn.png")
-
+    def asSupportStrategyPanel(self):
+        return None!=self.identifyAndFindPos("imgs\\GF\\Common\\Battle\\obtainHQ.png") or \
+               None != self.identifyAndFindPos("imgs\\GF\\Common\\Battle\\destroyEnemy.png") or \
+               None != self.identifyAndFindPos("imgs\\GF\\Common\\Battle\\supportWait.png")
+    def useFairySkill(self):
+        self.loopWait(self.asTeamSelected)
+        while(True):
+            if(None != self.identifyAndFindPos("imgs\\GF\\Common\\Battle\\fairyInstructionRelease1.png")):
+                self.identifyAndClick("imgs\\GF\\Common\\Battle\\fairyInstructionRelease1.png")
+            if(None != self.identifyAndFindPos("imgs\\GF\\Common\\Battle\\fairyInstructionRelease2.png")):
+                self.identifyAndClick("imgs\\GF\\Common\\Battle\\fairyInstructionRelease2.png")
+            if(None!=self.identifyAndFindPos("imgs\\GF\\Common\\Battle\\fairyInstructionCancel.png")):
+                break
+            if(None!=self.identifyAndFindPos("imgs\\GF\\Common\\Battle\\fairyInstructionLeftNone.png")):
+                break
     def scrollDown(self):
         scrollKeys=[ord(each) for each in "SDFGHJKL"]
         self.typeKey(scrollKeys[random.randint(0,len(scrollKeys)-1)],1)
     def scrollUp(self):
         scrollKeys=[ord(each) for each in "XCVBNM"]
-        self.typeKey(scrollKeys[random.randint(0,len(scrollKeys)-1)],1)
+        self.typeKey(scrollKeys[random.randint(0,len(scrollKeys)-1)],0.2)
+    def scrollRight(self):
+        scrollKeys=[ord(each) for each in "U"]
+        self.typeKey(scrollKeys[random.randint(0,len(scrollKeys)-1)],0.2)
     def recoverApp(self):
         self.log("Try Recover App...", 1)
         if (None == self.setUp(u'MuMu模拟器')):
@@ -134,22 +156,26 @@ class GFScriptTool(ScriptTool):
     def clickEchelonFormation_Preset_Options_N(self,number):
         #选项界面
         self.click((98,40), 0)
-        self.loopWait(self.asEchelonFormationPresetOptions,False,None,0)
+        self.loopWait(self.asEchelonFormationPresetOptions,False,None,0,failClickPos=(98,40),failWaitStep=0.5)
         #选项N
         if(number==0):
             self.click((80,15),0)
+            self.loopWait(self.asEchelonFormationPresetOptions,True,None,0,failClickPos=(80,15))
         elif(number==1):
             self.click((80,30),0)
-        self.loopWait(self.asEchelonFormationPresetOptions,True,None,0)
+            self.loopWait(self.asEchelonFormationPresetOptions, True, None, 0, failClickPos=(80,30))
         self.click((90,89),0.5)
         #可能的强制替换
         '''选中强制替换'''
         self.click((44,58),0.5)
         '''确定'''
         self.click((64,69.5),0.5)
-        self.loopWait(self.asEchelonFormationPresetPanel,None,None,0)
+        self.loopWait(self.asEchelonFormationPresetPanel,None,None,0,failClickPos=(64,69.5))
 
-    def clickBattle_StartBattle(self):
+
+
+
+    def clickBattle_StartBattle(self,planMode=False):
         #开始
         self.click((88,86), 0)
         self.loopWait(self.asBattle_PlanMode,assPara=False ,finishWait=0,failWaitStep=1)
@@ -161,8 +187,9 @@ class GFScriptTool(ScriptTool):
             pos0=self.identifyAndFindPos("imgs\\GF\\Common\\Battle\\battleInfo.png")
         self.click(pos1,0)
         self.loopWait(self.asBattle_PlanMode,assPara=True,failClickPos=pos1)
-        self.click(pos1,0)
-        self.loopWait(self.asBattle_PlanMode,assPara=False,failClickPos=pos1)
+        if(not planMode):
+            self.click(pos1,0)
+            self.loopWait(self.asBattle_PlanMode,assPara=False,failClickPos=pos1)
         print("[Battle Started]free to operate")
     def clickBattle_PlanMode(self):
         #计划模式
@@ -175,10 +202,10 @@ class GFScriptTool(ScriptTool):
     def clickBattle_PlanMode_Start(self):
         #计划模式
         self.loopWait(self.asBattle_PlanMode,assPara=True)
-        self.click((88,86), 0)
+        self.click((88,86), 1)
         for i in range(40):
             if(self.asBattle_PlanMode(True)):
-                self.click((88.86),0)
+                self.click((88,86),0)
             else:
                 break
         print("[planMode]executing")
@@ -223,21 +250,48 @@ class GFScriptTool(ScriptTool):
 
         pass
 
-    def swapWith(self, Pos):
+    def clickDeploySupportTeam(self, pos, assFunc, assPara):
+        self.loopWait(self.asBattle_PlanMode,False)
+        self.clickOpenDeployPanel(pos)
+        while(not self.identifyAndClick("imgs\\GF\\Common\\Battle\\supportTeam.png")):
+            pass
+        while(not self.identifyAndClick("imgs\\GF\\Common\\Battle\\nightTeam.png")):
+            pass
+        self.clickBattle_Deploy_YesBtn(assFunc,assPara)
+    def clickSwapWith(self, Pos):
         self.loopWait(self.asTeamSelected)
         self.loopWait(self.asSwapable,failClickPos=Pos,failWaitStep=0.5,finishWait=0.2)
         swapBtnPos=self.identifyAndFindPos("imgs\\GF\\Common\\Battle\\swapBtn.png")
         self.click(swapBtnPos,1.5)
-    def selectTeamAt(self,pos):
+    def clickSetSupportTeamStrategy(self,teamPos,strategyIndex=0):
+        self.loopWait(self.asBattle_PlanMode,False)
+        self.log("[SetSupportTeamStrategy]")
+        self.click(teamPos,0.5)
+        while(not self.asSupportStrategyPanel()):
+            if(self.asSelectable() or self.asSwapable()):
+                self.identifyAndClick("imgs\\GF\\Common\\Battle\\selectTeamBtn.png")
+            else:
+                self.click(teamPos,0.5)
+        if(strategyIndex==0):
+            self.identifyAndClick("imgs\\GF\\Common\\Battle\\destroyEnemy.png")
+        elif(strategyIndex==1):
+            self.identifyAndClick("imgs\\GF\\Common\\Battle\\supportWait.png")
+        else:
+            self.identifyAndClick("imgs\\GF\\Common\\Battle\\obtainHQ.png")
+        pass
+    def clickSelectTeamAt(self, pos):
         self.log("selectTeam",-1)
         self.click(pos,0.5)
         for i in range(10):
-            if(self.asTeamSelected()):
+            if(self.asSelectable() or self.asSwapable()):
+                self.identifyAndClick("imgs\\GF\\Common\\Battle\\selectTeamBtn.png")
+            elif(self.asTeamSelected()):
                 return
             elif(self.asDeployPanel()):
                 self.click((93,90),0.5)
             else:
                 self.click(pos,0.5)
+                time.sleep(0.2)
         print("[error]")
         exit(1)
     def clickOpenOperatePanel(self,pos):
@@ -250,6 +304,64 @@ class GFScriptTool(ScriptTool):
         self.click(pos, 0.5)
         while (not self.asDeployPanel()):
             self.click(pos, 0.5)
+    def clickChooseDifficulty(self, diff="N"):
+        print("[clickChooseDifficulty]")
+        if(diff=="N"):
+            if self.identifyAndClick("imgs\\GF\\Common\\BattleEntry\\difficulty_NORMAL_1.png") or \
+                self.identifyAndClick("imgs\\GF\\Common\\BattleEntry\\difficulty_NORMAL_2.png") or \
+                self.identifyAndClick("imgs\\GF\\Common\\BattleEntry\\difficulty_NORMAL_3.png"):
+                return
+    def clickFinishTurn(self,fastforward=False):
+        self.loopWait(self.asBattle_PlanMode,False)
+        pos0=self.identifyAndFindPos("imgs\\GF\\Common\\Battle\\planMode_INIT.png")
+        while(None==self.identifyAndFindPos("imgs\\GF\\Common\\Battle\\finishTurn.png")):
+            time.sleep(0.5)
+        while (None != self.identifyAndFindPos("imgs\\GF\\Common\\Battle\\finishTurn.png")):
+            self.identifyAndClick("imgs\\GF\\Common\\Battle\\finishTurn.png")
+            self.click((92,92),0.5)
+        if(fastforward):
+            while(True):
+                if(self.asBattle_PlanMode(False)):
+                    self.click(pos0,0.1)
+                    if(self.asBattle_PlanMode(True)):
+                        self.click(pos0,0.1)
+                        self.loopWait(self.asBattle_PlanMode,False,failClickPos=pos0)
+                        break
+                elif(self.asBattleEntryPanel()):
+                    break
+                elif(self.asBattleResult()):
+                    self.battleResultClear(1)
+                else:
+                    self.click(pos0,1)
+    def clickExecutePlanMode(self,route,initPlanStep):
+        self.clickBattle_PlanMode()
+        for index,pos in enumerate(route):
+            self.click(pos,0.1)
+            self.loopWait(self.asPlanStepLeft,initPlanStep-index,failClickPos=pos)
+        self.clickBattle_PlanMode_Start()
+    def clickDirectBattle(self,pos):
+        pos0=None
+        while pos0==None:
+            pos0=self.identifyAndFindPos("imgs\\GF\\Common\\Battle\\planMode_INIT.png")
+
+        self.click(pos,0.5)
+
+        while(self.asBattle_PlanMode(False)):
+            self.click(pos,1)
+        while(not (self.asBattle_PlanMode(False) or self.asBattle_PlanMode(True))):
+            self.click(pos0,2)
+        while(not self.asBattle_PlanMode(False)):
+            self.click(pos0,0.5)
+    def clickTurnFairyAutoSkill(self,on=False):
+        commonPath="imgs\\GF\\Common\\"
+        battlePath=commonPath+"Battle\\"
+        imgs=[battlePath+each for each in ["fairyOn.png","fairyOff.png"]]
+        if(on):
+            while not self.identifyAndFindPos(imgs[0]):
+                self.identifyAndClick(imgs[1])
+        else:
+            while not self.identifyAndFindPos(imgs[1]):
+                self.identifyAndClick(imgs[0])
 
     def identifyRescue(self):
         commonPath="imgs\\GF\\Common\\"
@@ -259,7 +371,7 @@ class GFScriptTool(ScriptTool):
         if(None!=self.identifyAndFindPos(entryPath + "Share.png")):
             self.log("identifying")
             ret=self.bestFitByDir(rect,rescuePath)
-            if((None!=ret) and (None!=self.identifyAndFindPos(rescuePath+ret[1],0.95))):
+            if((None!=ret) and(self.identifyAndFindPos(rescuePath+ret[1])!=None)):
                 if(ret[1].startswith("2")):
                     self.log("General(2)",32)
                     time.sleep(0.5)
@@ -275,7 +387,7 @@ class GFScriptTool(ScriptTool):
                     time.sleep(0.5)
             else:
                 self.assertCrop1(rect,rescuePath+"UNKNOWN%d.png"%random.randint(0,100),display=False)
-
+                pass
     def enterBattlePanel(self):
         commonPath="imgs\\GF\\Common\\"
         path=commonPath+"Error\\"
@@ -293,7 +405,7 @@ class GFScriptTool(ScriptTool):
             elif (self.asMainPanel()):
                 self.identifyAndClick("imgs\\GF\\Common\\MainPanel\\battle.png")
         pass
-    def battleResultClear(self,stableSecond=2):
+    def battleResultClear(self,stableSecond=2.0):
         commonPath="imgs\\GF\\Common\\"
         errPath=commonPath+"Error\\"
         entryPath=commonPath+"BattleEntry\\"
@@ -313,6 +425,15 @@ class GFScriptTool(ScriptTool):
                     time.sleep(stableSecond/3.0)
                     if (self.asBattleEntryPanel()):
                         break
+
+    def quitToMainPanel(self):
+        while(None!=self.identifyAndFindPos("imgs\\GF\\Common\\Battle\\missionSelect.png")):
+            self.identifyAndClick("imgs\\GF\\Common\\Battle\\missionSelect.png")
+        while(not self.asBattleEntryPanel()):
+            self.battleResultClear(1.5)
+        while(None!=self.identifyAndFindPos("imgs\\GF\\Common\\BattleEntry\\returnToBase.png")):
+            self.identifyAndClick("imgs\\GF\\Common\\BattleEntry\\returnToBase.png")
+        self.mainPanelClear()
     def mainPanelClear(self):
         commonPath="imgs\\GF\\Common\\"
         path=commonPath+"Error\\"
@@ -324,9 +445,24 @@ class GFScriptTool(ScriptTool):
             elif (self.identifyAndFindPos(path + "supportRestart.png")):
                 self.identifyAndClick(path + "yesBtn.png")
             elif (self.asMainPanel()):
-                time.sleep(4)
+                time.sleep(1)
                 if (self.asMainPanel()):
-                    break
+                    time.sleep(1)
+                    if (self.asMainPanel()):
+                        time.sleep(1)
+                        if (self.asMainPanel()):
+                            time.sleep(1)
+                            if (self.asMainPanel()):
+                                break
+    def returnToBattle(self):
+        commonPath="imgs\\GF\\Common\\"
+        self.loopWait(self.asMainPanel)
+        while (None == self.identifyAndFindPos(commonPath + "MainPanel\\petHouse.png")):
+            self.click((1, 50), 0.5)
+        while(self.asMainPanel()):
+            self.identifyAndClick(commonPath + "MainPanel\\fighting.png")
+            time.sleep(0.5)
+        self.loopWait(self.asBattle_PlanMode,False,loopMax=None)
     def errorTest(self):
         commonPath="imgs\\GF\\Common\\"
         path=commonPath+"Error\\"
@@ -352,10 +488,7 @@ class GFScriptTool(ScriptTool):
                 pass
             #login and return to main panel
             self.mainPanelClear()
-            self.loopWait(self.asMainPanel)
-            while(None==self.identifyAndFindPos(commonPath+"MainPanel\\petHouse.png")):
-                self.click((1,50),0.5)
-            self.identifyAndClick(commonPath+"MainPanel\\fighting.png")
+            self.returnToBattle()
             if(None!=self.code3RecoverFunc):
                 self.code3RecoverFunc()
             else:
@@ -365,7 +498,15 @@ class GFScriptTool(ScriptTool):
         return phase1()
 
 
-
+    def clickFactoryOption(self,index):
+        self.loopWait(self.asFactory)
+        pos = (7, 16 + 12.8 *index + 6.4)
+        self.click(pos, 0.2)
+        self.loopWait(self.asFactoryOption, assPara=index, failClickPos=pos)
+    def enterFactory(self):
+        self.loopWait(self.asMainPanel)
+        self.identifyAndClick("imgs\\GF\\Common\\MainPanel\\factory.png")
+        self.loopWait(self.asFactory)
 
 
 
@@ -380,11 +521,12 @@ if(__name__=="__main__"):
         fp=open("test.png","wb")
         im.save(fp)
         fp.close()
-
+    def test2():
+        pass
     def test3():
         tool.rectTest((0,0,1,1))
     def test4():
-        print(tool.click((99,86),0.5))
+        print(tool.clickEchelonFormation_Preset_Options_N(0))
     def test5():
         import random
         for i in range(10):
@@ -402,9 +544,14 @@ if(__name__=="__main__"):
         entryPath=commonPath+"BattleEntry\\"
         print(tool.battleResultClear())
     def test9():
-        tool.click((90,90))
-        #tool.mainPanelClear()
+        for i in range(10):
+            tool.click((70,50))
+            time.sleep(0.5)
+
+        #tool.rectTest((0,0,1,1))
+        #tool.quitToMainPanel()
+        #tool.clickTurnFairyAutoSkill(True)
         #tool.enterBattlePanel()
-    test9()
+    test4()
     #test8()
     #test3()

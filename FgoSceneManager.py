@@ -7,9 +7,11 @@ import os
 class FgoSceneManager:
     def __init__(self):
         self._tool=FgoScriptTool()
-        self._tool.setUp(u'命运-冠位指定 - MuMu模拟器')
-    def getBonus(self):
-        self._tool.loopWait(self._tool.asPoolEmpty,assPara=None,loopMax=1000,failClickPos=(25,65),failWaitStep=0)
+    def getBonus(self,pool):
+        for i in range(pool):
+            self._tool.loopWait(self._tool.asPoolEmpty,assPara=None,loopMax=1000,failClickPos=(25,65),failWaitStep=0)
+            self._tool.resetBonus()
+            time.sleep(0.5)
     def strengthen(self,loopCount):
         for i in range(loopCount):
             self._tool.loopWait(self._tool.asStrengthenPanel,assPara=None)
@@ -19,8 +21,8 @@ class FgoSceneManager:
                     X=50+15*(x-3)+6
                     Y=40+y*25
                     self._tool.click((X,Y),0)
-            self._tool.loopWait(self._tool.asStrengthenConfirmPanel,assPara=None,loopMax=20,failClickPos=(90,96),failWaitStep=0.1)
-            self._tool.loopWait(self._tool.asStrengthenPanel,assPara=None,loopMax=20,failClickPos=(65,82),failWaitStep=0.1)
+            self._tool.loopWait(self._tool.asStrengthenConfirmPanel,assPara=None,loopMax=None,failClickPos=(90,96),failWaitStep=0.1)
+            self._tool.loopWait(self._tool.asStrengthenPanel,assPara=None,loopMax=None,failClickPos=(65,82),failWaitStep=0.1)
     def finalPlay(self,loopCount):
         #终本
         tool=self._tool
@@ -166,6 +168,7 @@ class FgoSceneManager:
 
 if __name__ == "__main__":
     mngr=FgoSceneManager()
-    #mngr.getBonus()
+    #mngr.getBonus(2)
+    mngr.strengthen(5)
     #mngr.finalPlay(100)
-    mngr.finalPlay(500)
+    #mngr.finalPlay(500)
