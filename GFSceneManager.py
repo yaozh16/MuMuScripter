@@ -46,7 +46,6 @@ class GFSceneManager:
                 self.tool.log("deploy done")
             tool.clickBattle_StartBattle(planMode=True)
         def phase2_s1_planExecute_1():
-            tool.loopWait(tool.asBattle_PlanMode, assPara=True, loopMax=10, finishWait=1)
             #tool.clickSelectTeamAt(airPort[0])
             route1=[airPort[0]]
             route1.extend(battlePos[0:1])
@@ -74,7 +73,6 @@ class GFSceneManager:
                 time.sleep(0.5)
         def phase2_s2_planExecute_1():
 
-            tool.loopWait(tool.asBattle_PlanMode, assPara=True, loopMax=10, finishWait=1)
             #tool.clickSelectTeamAt(airPort[0])
             route1=[airPort[0]]
             route1.extend(battlePos[0:3])
@@ -99,7 +97,6 @@ class GFSceneManager:
                 tool.identifyRescue()
                 time.sleep(0.5)
         def phase2_s3_planExecute():
-            tool.loopWait(tool.asBattle_PlanMode, assPara=True, loopMax=10, finishWait=1)
             # tool.clickSelectTeamAt(airPort[0])
             route1 = [airPort[0]]
             route1.extend(battlePos)
@@ -108,7 +105,7 @@ class GFSceneManager:
                 tool.identifyRescue()
                 time.sleep(0.5)
         def phase3_initSwapAndWithdraw():
-            tool.loopWait(tool.asBattle_PlanMode, assPara=False, loopMax=100, finishWait=0, failWaitStep=1)
+            tool.loopWait(tool.asBattle_PlanMode, assPara=False, loopMax=None, finishWait=0, failWaitStep=1)
             tool.clickSelectTeamAt(battlePos[4])
             tool.clickSwapWith(airPort[2])
             tool.clickOpenOperatePanel(airPort[2])
@@ -143,47 +140,40 @@ class GFSceneManager:
             tool.clickBattle_Restart()
         def scriptLoop():
             phase1_deployStart()
-            if(useSkillStyle==0):
+            if(useSkillStyle==3):
                 phase2_s1_planExecute_1()
                 phase2_s1_planExecute_2()
                 phase2_s1_planExecute_3()
-            elif(useSkillStyle==2):
+            elif(useSkillStyle==1):
                 phase2_s2_planExecute_1()
                 phase2_s2_planExecute_2()
                 phase2_s2_planExecute_3()
             else:
                 phase2_s3_planExecute()
 
+            phase3_initSwapAndWithdraw()
+            teamFormationAdopt(1)
+            phase4_deployRefuelAndWithdraw()
+            teamFormationAdopt(0)
+
             self.collectingPhase()
+            phase5_restartGame()
+            pass
+        def initScript():
+            '''phase1_deployStart()
+            phase2_s1_planExecute_2()
+            phase2_s1_planExecute_3()
+            phase2_s2_planExecute_2()
+            phase2_s2_planExecute_3()
+            '''
             phase3_initSwapAndWithdraw()
             teamFormationAdopt(1)
             phase4_deployRefuelAndWithdraw()
             teamFormationAdopt(0)
             phase5_restartGame()
             pass
-        def initScript():
-            #phase1_deployStart()
-            #phase2_planExecute_1()
-            #phase2_planExecute_2()
-            #phase2_planExecute_3()
-            #phase3_initSwapAndWithdraw()
-            #teamFormationAdopt(1)
-            #phase4_deployRefuelAndWithdraw()
-            #teamFormationAdopt(0)
-            #phase5_restartGame()
-            pass
-        print("start!")
-        initScript()
-        T0=time.time()
-        for c in range(loopCount):
-            print("\a")
-            print("_________________________________________________________")
-            print("\033[1;32m[Loop %d]\033[0m"%(c+1))
-            print("_________________________________________________________")
-            T1=time.time()
-            scriptLoop()
-            print("[Time]:%.1f"%(time.time()-T1))
-        print("[Time Average]:%.1f" % ((time.time() - T0)/loopCount))
+
+        self._timerStart(initScript=initScript,scriptLoop=scriptLoop,loopCount=loopCount)
     def Zas_81n(self,loopCount_UseSupport):
         loopCount,useSupport=loopCount_UseSupport
         tool=self.tool
@@ -198,31 +188,27 @@ class GFSceneManager:
             tool.skipDlg()
             tool.loopWait(tool.asBattle_Init)
             tool.scrollUp()
+            tool.scrollUp()
             for i in range(3):
                  tool.click(airPort[i])
                  tool.loopWait( tool.asDeployPanel,failClickPos=airPort[i])
                  tool.clickBattle_Deploy_YesBtn( tool.asBattle_Init,None)
             tool.clickBattle_StartBattle()
-        def phase2():
-            self.tool.log("[phase2]")
-            def refuelAndWithdraw():
-                self.tool.log("[refuel]")
-                tool.clickOpenOperatePanel(airPort[2])
-                tool.clickBattle_TeamOperate_Refuel()
-                self.tool.log('[withdraw]')
-                tool.clickOpenOperatePanel(airPort[2])
-                tool.clickBattle_TeamOperate_Withdraw()
-            def planModePlannig():
-                tool.clickSelectTeamAt(airPort[0])
-                tool.clickBattle_PlanMode()
-                for i in range(5):
-                    tool.click(battlePos[i],0.2)
-                    tool.loopWait( tool.asPlanStepLeft,assPara=6-i,failClickPos=battlePos[i],failWaitStep=0.5)
-            def planModeExecuting():
-                tool.clickBattle_PlanMode_Start()
-            refuelAndWithdraw()
-            planModePlannig()
-            planModeExecuting()
+        def phase2_refuelAndWithdraw():
+            self.tool.log("[refuel]")
+            tool.clickOpenOperatePanel(airPort[2])
+            tool.clickBattle_TeamOperate_Refuel()
+            self.tool.log('[withdraw]')
+            tool.clickOpenOperatePanel(airPort[2])
+            tool.clickBattle_TeamOperate_Withdraw()
+            pass
+        def phase2_planModeExecuting():
+            tool.clickSelectTeamAt(airPort[0])
+            tool.clickBattle_PlanMode()
+            for i in range(5):
+                tool.click(battlePos[i], 0.2)
+                tool.loopWait(tool.asPlanStepLeft, assPara=6 - i, failClickPos=battlePos[i], failWaitStep=0.5)
+            tool.clickBattle_PlanMode_Start()
         def phase3():
             def wait():
                 time.sleep(75)
@@ -308,7 +294,8 @@ class GFSceneManager:
             tool.clickBattle_Restart()
         def scriptLoop():
             phase1()
-            phase2()
+            phase2_refuelAndWithdraw()
+            phase2_planModeExecuting()
             phase3()
             self.collectingPhase()
             if(useSupport):
@@ -316,18 +303,19 @@ class GFSceneManager:
             else:
                 phase4_2()
             pass
-
-        print("start!")
-        T0 = time.time()
-        for c in range(loopCount):
-            print("\a")
-            print("_________________________________________________________")
-            print("\033[1;32m[Loop %d]\033[0m" % (c + 1))
-            print("_________________________________________________________")
-            T1 = time.time()
-            scriptLoop()
-            print("[Time]:%.1f" % (time.time() - T1))
-        print("[Time Average]:%.1f" % ((time.time() - T0) / loopCount))
+        def initScript():
+            '''phase1()
+            phase2_refuelAndWithdraw()
+            phase2_planModeExecuting()
+            phase3()
+            self.collectingPhase()
+            if(useSupport):
+                phase4_1()
+            else:
+                phase4_2()
+            '''
+            pass
+        self._timerStart(initScript,scriptLoop,loopCount)
     def HS2000_14e(self,loopCount):
         tool = self.tool
 
@@ -672,7 +660,7 @@ class GFSceneManager:
                 tool.scrollUp()
             tool.clickOpenDeployPanel(airPort[1])
             tool.clickBattle_Deploy_YesBtn(tool.asBattle_Init, None)
-            tool.clickBattle_StartBattle()
+            tool.clickBattle_StartBattle(planMode=True)
             tool.log("[deploy done]")
         def phase_planMove():
             pastPos=[(86,22),(84.5,43),(77,64),(67,78),(78,83)]
@@ -685,10 +673,10 @@ class GFSceneManager:
                     tool.click((50,50),0)
                     while not tool.asBattlePaused():
                         tool.log("[try pause]",32)
-                        tool.click((50,2),0.1)
+                        tool.click((50,2),0.1,randRange=(1,1))
                     tool.log("[try withdraw]",32)
                     tool.click((30,5),0.1,randRange=(1,1))
-                    tool.loopWaitRev(tool.asBattle_PlanMode,False,failFunc=tool.asAmbushed,failClickPos=(30,5),failWaitStep=0.1)
+                    tool.loopWait(tool.asBattle_PlanMode,False,failClickPos=(30,5),failWaitStep=0.1)
                     break
                 elif(tool.asBattle_PlanMode(False)):
                     tool.log("[succeed]",32)
@@ -716,13 +704,25 @@ class GFSceneManager:
         self._timerStart(initScript,scriptLoop,loopCount)
     def collectingPhase(self):
         tool=self.tool
-        if(random.randint(0,100)<0):
+        if(random.randint(0,100)<200):
             tool.log("[collecting...]",32)
             tool.quitToMainPanel()
             #self.enterFactoryToRetire(False)
             tool.returnToBattle()
             tool.log("[collect done]",32)
-
+    def finishWaitRestart(self):
+        tool=self.tool
+        t=time.localtime()
+        tool.log("%d:%d:%d"%(t.tm_hour,t.tm_min,t.tm_sec))
+        tool.skipDlg()
+        tool.quitToMainPanel()
+        t=time.localtime()
+        tool.log("%d:%d:%d"%(t.tm_hour,t.tm_min,t.tm_sec))
+        while(True):
+            time.sleep(300)
+            t=time.localtime()
+            tool.log("%d:%d:%d"%(t.tm_hour,t.tm_min,t.tm_sec))
+            tool.mainPanelClear()
 
 
 
@@ -816,8 +816,12 @@ class GFSceneManager:
                 print("\a",end=" ")
                 time.sleep(0.5)
         startScript()
+
+
 if(__name__=="__main__"):
     mngr=GFSceneManager()
     #mngr.start(GFSceneManager.enterFactoryToRetire,False)
-    mngr.start(GFSceneManager.SOP_115,(20,3))
+    #mngr.start(GFSceneManager.Zas_81n,(30,False))
+    mngr.start(GFSceneManager.SOP_115,(40,3))
+    #mngr.finishWaitRestart()
     #mngr.start(GFSceneManager.Any_46_fileCollecting,300)

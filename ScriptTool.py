@@ -30,6 +30,7 @@ class ScriptTool:
         clsname = win32gui.GetClassName(self._hwnd)
         print("[title]\033[1;32m%s\033[0m"%title)
         print("[class]\033[1;32m%s\033[0m"%clsname)
+        print("[hwnd]\033[1;32m%d\033[0m"%self._hwnd)
         print("[position]\033[1;32m(%d,%d,%d,%d):[w]%d[h]%d\033[0m"%(left,top,right,bottom,right-left,bottom-top))
         #win32gui.SetForegroundWindow(self._hwnd)
         win32api.SendMessage(self._hwnd,win32con.WM_ACTIVATE,None)
@@ -227,6 +228,7 @@ class ScriptTool:
         self.screenRecord()
         imsrc = ac.imread(self._temRecordImage)
         match_result = ac.find_template(imsrc, imobj, confidence)
+
         if (match_result != None):
             centerPoint = match_result["result"]
             clickPos = (centerPoint[0] * 100.0 / imsrc.shape[1], centerPoint[1] * 100.0 / imsrc.shape[0])
@@ -256,7 +258,7 @@ class ScriptTool:
         w, h = screen.size
 
         cropped = screen.crop((int(w * rect[0]), int(h * rect[1]), int(w * rect[2]), int(h * rect[3])))
-        
+
         croppedList = np.array(cropped.histogram())
         best = None
         files=os.listdir(directory)
@@ -338,6 +340,7 @@ if __name__=="__main__":
     tool=ScriptTool()
     #tool.setUp(u'BlueStacks App Player')
     tool.setUp(u'少女前线 - MuMu模拟器')
+
     img=tool.screenRecord()
     img.show()
     tool.click((50,50),0)
