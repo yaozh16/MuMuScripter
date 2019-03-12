@@ -11,11 +11,15 @@ import win32con
 import win32api
 class ScriptTool:
     def __init__(self):
+        def defaultErrorTest():
+            pass
+        self.errorTest=defaultErrorTest
         self._hwnd=0
         self._temRecordImage="screen.png"
         self._temRecordImage2="screen2.png"
         random.seed(time.time())
         self._offset=[0,36]
+
 
     def setUp(self,windowName):
         self._hwnd = win32gui.FindWindow(None, windowName)
@@ -23,18 +27,24 @@ class ScriptTool:
             print("window not found!")
             return None
 
-        # 获取窗口位置
+        self.printWindowStatus()
+        win32api.SendMessage(self._hwnd,win32con.WM_ACTIVATE,None)
+        return self._hwnd
+    def printWindowStatus(self):
+        if (self._hwnd == 0):
+            print("window not found!")
+            return None
+
+            # 获取窗口位置
         left, top, right, bottom = win32gui.GetWindowRect(self._hwnd)
         # 获取某个句柄的类名和标题
         title = win32gui.GetWindowText(self._hwnd)
         clsname = win32gui.GetClassName(self._hwnd)
-        print("[title]\033[1;32m%s\033[0m"%title)
-        print("[class]\033[1;32m%s\033[0m"%clsname)
-        print("[hwnd]\033[1;32m%d\033[0m"%self._hwnd)
-        print("[position]\033[1;32m(%d,%d,%d,%d):[w]%d[h]%d\033[0m"%(left,top,right,bottom,right-left,bottom-top))
-        #win32gui.SetForegroundWindow(self._hwnd)
-        win32api.SendMessage(self._hwnd,win32con.WM_ACTIVATE,None)
-        return self._hwnd
+        print("[title]\033[1;32m%s\033[0m" % title)
+        print("[class]\033[1;32m%s\033[0m" % clsname)
+        print("[hwnd]\033[1;32m%d\033[0m" % self._hwnd)
+        print("[position]\033[1;32m(%d,%d,%d,%d):[w]%d[h]%d\033[0m" % (
+        left, top, right, bottom, right - left, bottom - top))
     def typeKey(self,KeyCode,timeWait=0.0,continuePrintKey=False):
         if(self._hwnd==0):
             return
@@ -274,8 +284,6 @@ class ScriptTool:
         return best
 
 
-    def errorTest(self):
-        pass
     def assertCrop1(self, percentRect, expectImage, rgbThresh=(0, 0, 0), display=True):
         screen=self.screenRecord()
         w,h=screen.size
@@ -336,13 +344,22 @@ class ScriptTool:
         diff=np.average(np.square(np.subtract(stdList,croppedList)))
         #print("(%f)"%diff,end=" ")
         return diff<1
+
+
+    def gameTab(self,index):
+        if(index==0):
+            self.click((28,-1),0.2)
+        elif(index==1):
+            self.click((40,-1),0.2)
 if __name__=="__main__":
     tool=ScriptTool()
     #tool.setUp(u'BlueStacks App Player')
-    tool.setUp(u'少女前线 - MuMu模拟器')
+    #tool.setUp(u'少女前线 - MuMu模拟器')
+    tool.setUp(u'命运-冠位指定 - MuMu模拟器')
 
     img=tool.screenRecord()
-    img.show()
-    tool.click((50,50),0)
+    #tool.click((40,-1),0)
+    tool.click((28,-1),0)
+    tool.printWindowStatus()
     #tool.click((40,50),0.4)
     #tool.click((50,50),0.5)

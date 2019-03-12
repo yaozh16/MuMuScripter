@@ -10,6 +10,7 @@ class GFScriptTool(ScriptTool):
         self.code3RecoverFunc=None
         self._temRecordImage="imgs\\GF\\Common\\tmp\\tmp.png"
         self._temRecordImage2="imgs\\GF\\Common\\tmp\\tmp2.png"
+        self._identifyStatistic=[0,0,0,0]
         if(None==self.setUp(u'少女前线 - MuMu模拟器')):
             self.recoverApp()
     def asEchelonFormationPanel(self):
@@ -372,21 +373,26 @@ class GFScriptTool(ScriptTool):
             if((None!=ret) and(self.identifyAndFindPos(rescuePath+ret[1])!=None)):
                 if(ret[1].startswith("2")):
                     self.log("General(2)",32)
+                    self._identifyStatistic[0]+=1
                     time.sleep(0.5)
                 elif (ret[1].startswith("3")):
                     self.log("Rare(3)",34)
+                    self._identifyStatistic[1]+=1
                     time.sleep(0.5)
                 elif (ret[1].startswith("4")):
                     self.log("SR(4)",32)
+                    self._identifyStatistic[2]+=1
                     time.sleep(0.5)
                 elif (ret[1].startswith("5")):
                     self.log("Legendary(5)",33)
+                    self._identifyStatistic[3]+=1
                     self.click((50,50),0.5)
                     time.sleep(0.5)
+                self.log("(2)%d,(3)%d,(4)%d,(5)%d"%(self._identifyStatistic[0],self._identifyStatistic[1],self._identifyStatistic[2],self._identifyStatistic[3]))
             else:
                 if(ret!=None):
                     self.log("[Missed]possible:%s(%d)"%(ret[1],ret[0]))
-                    self.assertCrop1(rect,rescuePath+"UNKNOWN%d.png"%random.randint(0,100),display=False)
+                    #self.assertCrop1(rect,rescuePath+"UNKNOWN%d.png"%random.randint(0,100),display=False)
                 pass
     def enterBattlePanel(self):
         commonPath="imgs\\GF\\Common\\"
@@ -429,14 +435,30 @@ class GFScriptTool(ScriptTool):
                             break
 
     def quitToMainPanel(self):
-        while(None!=self.identifyAndFindPos("imgs\\GF\\Common\\Battle\\missionSelect.png")):
-            self.identifyAndClick("imgs\\GF\\Common\\Battle\\missionSelect.png")
-        self.battleEntryClear()
-        while(not self.asBattleEntryPanel()):
-            self.battleResultClear(1.5)
-        while(None!=self.identifyAndFindPos("imgs\\GF\\Common\\BattleEntry\\returnToBase.png")):
-            self.identifyAndClick("imgs\\GF\\Common\\BattleEntry\\returnToBase.png")
-        self.mainPanelClear()
+        commonPath = "imgs\\GF\\Common\\"
+        path = commonPath + "Error\\"
+        while(True):
+            if(None!=self.identifyAndFindPos("imgs\\GF\\Common\\Battle\\missionSelect.png")):
+                self.identifyAndClick("imgs\\GF\\Common\\Battle\\missionSelect.png")
+            elif(self.asBattleEntryPanel()):
+                self.battleEntryClear()
+            elif(None!=self.identifyAndFindPos("imgs\\GF\\Common\\BattleEntry\\returnToBase.png")):
+                self.identifyAndClick("imgs\\GF\\Common\\BattleEntry\\returnToBase.png")
+            elif (self.identifyAndFindPos(path + "supportFinish.png")):
+                self.identifyAndClick(path + "supportFinish.png")
+            elif (self.identifyAndFindPos(path + "supportRestart.png")):
+                self.log("[resource mission restart]")
+                self.identifyAndClick(path + "yesBtn.png")
+            elif (self.asMainPanel()):
+                time.sleep(1)
+                if (self.asMainPanel()):
+                    time.sleep(1)
+                    if (self.asMainPanel()):
+                        time.sleep(1)
+                        if (self.asMainPanel()):
+                            time.sleep(1)
+                            if (self.asMainPanel()):
+                                break
     def mainPanelClear(self):
         commonPath="imgs\\GF\\Common\\"
         path=commonPath+"Error\\"
@@ -576,7 +598,7 @@ if(__name__=="__main__"):
         #tool.rectTest((0,0,1,1))
         #tool.quitToMainPanel()
         #tool.clickTurnFairyAutoSkill(True)
-        tool.returnToBattle()
+        tool.rectTest((0,0,1,1))
     #test4()
     #test8()
     #test3()

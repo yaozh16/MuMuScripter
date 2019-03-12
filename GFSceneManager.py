@@ -12,7 +12,7 @@ import random
 class GFSceneManager:
     def __init__(self):
         self.tool=GFScriptTool()
-        pass
+        self.countDown=0
     def _timerStart(self,initScript,scriptLoop,loopCount):
         tool=self.tool
         tool.log("[initScript]")
@@ -165,12 +165,12 @@ class GFSceneManager:
             phase2_s1_planExecute_3()
             phase2_s2_planExecute_2()
             phase2_s2_planExecute_3()
-            '''
             phase3_initSwapAndWithdraw()
             teamFormationAdopt(1)
             phase4_deployRefuelAndWithdraw()
             teamFormationAdopt(0)
             phase5_restartGame()
+            '''
             pass
 
         self._timerStart(initScript=initScript,scriptLoop=scriptLoop,loopCount=loopCount)
@@ -704,7 +704,9 @@ class GFSceneManager:
         self._timerStart(initScript,scriptLoop,loopCount)
     def collectingPhase(self):
         tool=self.tool
-        if(random.randint(0,100)<200):
+        self.countDown+=1
+        clock=2
+        if(self.countDown%clock==(clock-1)):
             tool.log("[collecting...]",32)
             tool.quitToMainPanel()
             #self.enterFactoryToRetire(False)
@@ -804,6 +806,8 @@ class GFSceneManager:
         else:
             retire2StarMG()
         returnToMainPanel()
+
+
     def start(self,script,paraTuple):
         def startScript():
             for i in range(3):
@@ -822,6 +826,6 @@ if(__name__=="__main__"):
     mngr=GFSceneManager()
     #mngr.start(GFSceneManager.enterFactoryToRetire,False)
     #mngr.start(GFSceneManager.Zas_81n,(30,False))
-    mngr.start(GFSceneManager.SOP_115,(40,3))
-    #mngr.finishWaitRestart()
+    mngr.start(GFSceneManager.SOP_115,(40,0))
+    #mngr.finishWaitRestart()+
     #mngr.start(GFSceneManager.Any_46_fileCollecting,300)

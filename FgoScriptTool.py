@@ -78,7 +78,7 @@ class FgoScriptTool(ScriptTool):
         L2 = 0.10
         window = (p - L1, 0.3 - L2, p + L1, 0.3 + L2)
         #self.rectTest(window)
-        self.click((index*20+30,30),0.8)
+        self.click((index*20+30,30),0.9)
         pass
     def eatApple(self,type="G"):
         imgPath="imgs\\FGO\\Common\\Apple_"
@@ -118,7 +118,7 @@ class FgoScriptTool(ScriptTool):
             self.click((65,18),1)
             self.click((60,78),1)
         else:
-            self.click((97,30+12*count),0.5)
+            self.click((97,42+12*count),0.5)
         return (count+1)%8
     def currentBattle(self, TurnImagePath):
         self.waitReady(finishWait=0)
@@ -134,9 +134,25 @@ class FgoScriptTool(ScriptTool):
         self.identifyAndClick("imgs\\FGO\\Common\\resetBonus.png")
         self.loopWait(self.identifyAndClick,"imgs\\FGO\\Common\\resetConfirm.png")
         self.loopWait(self.identifyAndClick,"imgs\\FGO\\Common\\closeBtn.png")
+    def enterBattle(self,entryImage,supporterServentImage):
+        self.loopWait(self.asMainPanel, assPara=None, loopMax=None)
+        self.identifyAndClick(entryImage)
+        while not self.asSupportPanel():
+            print("--eatApple")
+            time.sleep(1)
+            if (self.asAPRecoverPanel()):
+                self.eatApple("S")
+            elif (self.asMainPanel()):
+                self.identifyAndClick(entryImage)
+        print("--selectSupporter")
+        self.selectGoodSupporter(supporterServentImage)
+        print("--prepare")
+        while (self.asPreparePanel()):
+            self.identifyAndClick("imgs\\FGO\\Common\\PreparePanel.png")
+
 
     def asMainPanel(self):
-        return self.assertCrop2((0.88,0.02,0.97,0.09),expectImage="imgs\\FGO\\Common\\MainPanel.png")
+        return None!=self.identifyAndFindPos("imgs\\FGO\\Common\\MainPanel.png")
     def asSupportPanel(self):
         #助战
         return self.assertCrop2((0.62, 0.15, 0.68, 0.21), "imgs\\FGO\\Common\\SupportPanel.png")
@@ -144,7 +160,7 @@ class FgoScriptTool(ScriptTool):
         #助战
         return self.assertCrop2((0.30, 0.30, 0.70, 0.60), "imgs\\FGO\\Common\\SupportUpdatePanel.png")
     def asPreparePanel(self):
-        return self.assertCrop2((0.87,0.90,0.99,0.99),"imgs\\FGO\\Common\\PreparePanel.png")
+        return None!=self.identifyAndFindPos("imgs\\FGO\\Common\\PreparePanel.png")
     def asBattleReady(self):
         #可以行动
         return None!=self.identifyAndFindPos("imgs\\FGO\\Common\\BattleReady.png")
